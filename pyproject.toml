@@ -48,6 +48,8 @@ testpaths = ["tests"]
 [tool.pyright]
 typeCheckingMode = "strict"
 pythonVersion = "3.10"
+reportMissingTypeStubs = false
+reportPrivateUsage = "none"
 
 [tool.semantic_release]
 build_command = """

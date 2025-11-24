@@ -107,17 +107,17 @@ class TestImageProcessing:
         words = root.findall(".//{http://www.w3.org/1999/xhtml}span[@class='ocrx_word']")
         assert len(words) > 0
 
-    @pytest.mark.skipif(
-        platform.mac_ver()[0] and int(platform.mac_ver()[0].split(".")[0]) < 14,
-        reason="LiveText requires macOS Sonoma 14.0+",
-    )
     def test_process_with_livetext_recognition(
         self,
         engine: OcrmacEngine,
         sample_jpg: Path,
         hocr_validator: Callable[[str], ET.Element],
+        livetext_available: bool,
     ) -> None:
         """Test processing with LIVETEXT recognition level (Sonoma 14.0+ only)."""
+        if not livetext_available:
+            pytest.skip("LiveText not available or not working on this system")
+
         params = OcrmacParams(recognition_level=RecognitionLevel.LIVETEXT)
         result = engine.process(sample_jpg, params)
 
@@ -254,9 +254,7 @@ class TestPDFProcessing:
 class TestHOCROutput:
     """Integration tests for HOCR output validation."""
 
-    def test_hocr_has_xml_declaration(
-        self, engine: OcrmacEngine, sample_jpg: Path
-    ) -> None:
+    def test_hocr_has_xml_declaration(self, engine: OcrmacEngine, sample_jpg: Path) -> None:
         """Test that HOCR output has XML declaration."""
         result = engine.process(sample_jpg)
         assert result.startswith('<?xml version="1.0" encoding="UTF-8"?>')
@@ -272,9 +270,7 @@ class TestHOCROutput:
         result = engine.process(sample_jpg)
         assert 'xmlns="http://www.w3.org/1999/xhtml"' in result
 
-    def test_hocr_word_bboxes_are_valid(
-        self, engine: OcrmacEngine, sample_jpg: Path
-    ) -> None:
+    def test_hocr_word_bboxes_are_valid(self, engine: OcrmacEngine, sample_jpg: Path) -> None:
         """Test that all word bboxes are valid (x_min < x_max, y_min < y_max)."""
         result = engine.process(sample_jpg)
         root = ET.fromstring(result)
@@ -295,9 +291,7 @@ class TestHOCROutput:
             assert x_min >= 0, f"Invalid bbox: x_min ({x_min}) < 0"
             assert y_min >= 0, f"Invalid bbox: y_min ({y_min}) < 0"
 
-    def test_hocr_confidence_in_range(
-        self, engine: OcrmacEngine, sample_jpg: Path
-    ) -> None:
+    def test_hocr_confidence_in_range(self, engine: OcrmacEngine, sample_jpg: Path) -> None:
         """Test that all confidence values are in range 0-100."""
         result = engine.process(sample_jpg)
         root = ET.fromstring(result)
@@ -312,13 +306,9 @@ class TestHOCROutput:
             if conf_part:
                 conf_str = conf_part[0].strip()[8:]
                 confidence = int(conf_str)
-                assert 0 <= confidence <= 100, (
-                    f"Confidence out of range: {confidence}"
-                )
+                assert 0 <= confidence <= 100, f"Confidence out of range: {confidence}"
 
-    def test_hocr_words_have_text(
-        self, engine: OcrmacEngine, sample_jpg: Path
-    ) -> None:
+    def test_hocr_words_have_text(self, engine: OcrmacEngine, sample_jpg: Path) -> None:
         """Test that all word elements have non-empty text."""
         result = engine.process(sample_jpg)
         root = ET.fromstring(result)
@@ -357,9 +347,7 @@ class TestHOCROutput:
         assert x_min == 0, "Page bbox x_min should be 0"
         assert y_min == 0, "Page bbox y_min should be 0"
         assert x_max == img_width, f"Page bbox x_max ({x_max}) != image width ({img_width})"
-        assert y_max == img_height, (
-            f"Page bbox y_max ({y_max}) != image height ({img_height})"
-        )
+        assert y_max == img_height, f"Page bbox y_max ({y_max}) != image height ({img_height})"
 
 
 @pytest.mark.integration
@@ -374,9 +362,7 @@ class TestEndToEnd:
     ) -> None:
         """Test complete workflow from JPG to HOCR."""
         # Process with custom params
-        params = OcrmacParams(
-            languages=["en-US"], recognition_level=RecognitionLevel.BALANCED
-        )
+        params = OcrmacParams(languages=["en-US"], recognition_level=RecognitionLevel.BALANCED)
         result = engine.process(sample_jpg, params)
 
         # Validate structure
@@ -398,9 +384,7 @@ class TestEndToEnd:
     ) -> None:
         """Test complete workflow from PDF to HOCR."""
         # Process with custom params
-        params = OcrmacParams(
-            languages=["en-US"], recognition_level=RecognitionLevel.FAST
-        )
+        params = OcrmacParams(languages=["en-US"], recognition_level=RecognitionLevel.FAST)
         result = engine.process(sample_pdf_en, params)
 
         # Validate structure

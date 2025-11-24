@@ -157,6 +157,37 @@ def bbox_parser() -> Callable[[str], dict[str, Any]]:
     return parse
 
 
+@pytest.fixture(scope="session")
+def livetext_available() -> bool:
+    """Check if LiveText is actually available and working.
+
+    Returns True if LiveText can be safely used, False otherwise.
+    """
+    try:
+        import platform
+
+        from ocrmac.ocrmac import LIVETEXT_AVAILABLE
+
+        # Check if LiveText is reported as available
+        if not LIVETEXT_AVAILABLE:
+            return False
+
+        # Check for reasonable macOS version (12.x - 16.x range)
+        mac_version = platform.mac_ver()[0]
+        if mac_version:
+            try:
+                major_version = int(mac_version.split(".")[0])
+                # Version should be in reasonable range (12-16) and >= 14 for LiveText
+                if major_version < 14 or major_version > 16:
+                    return False
+            except (ValueError, IndexError):
+                return False
+
+        return True
+    except Exception:
+        return False
+
+
 def pytest_configure(config: Any) -> None:
     """Register custom pytest markers."""
     config.addinivalue_line(

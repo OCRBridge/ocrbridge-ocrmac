@@ -4,12 +4,12 @@ import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any, Callable
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
+from ocrbridge.core import OCRProcessingError, UnsupportedFormatError
 from PIL import Image
 
-from ocrbridge.core import OCRProcessingError, UnsupportedFormatError
 from ocrbridge.engines.ocrmac import OcrmacEngine, OcrmacParams, RecognitionLevel
 
 
@@ -199,9 +199,7 @@ class TestFileValidation:
             try:
                 # File exists and format is valid, but will fail later in processing
                 # (that's ok, we're just testing format validation here)
-                with patch.object(engine, "_process_image"), patch.object(
-                    engine, "_process_pdf"
-                ):
+                with patch.object(engine, "_process_image"), patch.object(engine, "_process_pdf"):
                     try:
                         engine.process(tmp_path)
                     except Exception:
@@ -264,9 +262,7 @@ class TestHOCRConversion:
         assert words[2].text == "Test"
         assert words[2].attrib.get("id") == "word_1_3"
 
-    def test_coordinate_transformation(
-        self, bbox_parser: Callable[[str], dict[str, Any]]
-    ) -> None:
+    def test_coordinate_transformation(self, bbox_parser: Callable[[str], dict[str, Any]]) -> None:
         """Test coordinate transformation from ocrmac to HOCR format.
 
         ocrmac: relative coords (0.0-1.0), bottom-left origin
@@ -298,9 +294,7 @@ class TestHOCRConversion:
         assert bbox["bbox"]["y_min"] == 640
         assert bbox["bbox"]["y_max"] == 720
 
-    def test_confidence_conversion(
-        self, bbox_parser: Callable[[str], dict[str, Any]]
-    ) -> None:
+    def test_confidence_conversion(self, bbox_parser: Callable[[str], dict[str, Any]]) -> None:
         """Test confidence conversion from 0-1 to 0-100."""
         engine = OcrmacEngine()
         params = OcrmacParams()
@@ -362,9 +356,7 @@ class TestHOCRPageMerging:
         result = engine._merge_hocr_pages([page_hocr])
         assert result == page_hocr
 
-    def test_merge_multiple_pages(
-        self, hocr_validator: Callable[[str], ET.Element]
-    ) -> None:
+    def test_merge_multiple_pages(self, hocr_validator: Callable[[str], ET.Element]) -> None:
         """Test merging multiple pages."""
         engine = OcrmacEngine()
 
@@ -427,7 +419,7 @@ class TestHOCRPageMerging:
         result = engine._merge_hocr_pages([page1, page2])
 
         # Should have valid structure
-        root = hocr_validator(result)
+        hocr_validator(result)
 
 
 class TestProcessMethod:
@@ -490,9 +482,7 @@ class TestProcessMethod:
             tmp_path = Path(tmp.name)
 
         try:
-            with patch.object(
-                engine, "_process_pdf", return_value="<hocr></hocr>"
-            ) as mock_pdf:
+            with patch.object(engine, "_process_pdf", return_value="<hocr></hocr>") as mock_pdf:
                 engine.process(tmp_path)
                 mock_pdf.assert_called_once()
         finally:
@@ -510,9 +500,7 @@ class TestProcessMethod:
             img.save(tmp_path)
 
         try:
-            with patch.object(
-                engine, "_process_image", return_value="<hocr></hocr>"
-            ) as mock_image:
+            with patch.object(engine, "_process_image", return_value="<hocr></hocr>") as mock_image:
                 engine.process(tmp_path)
                 mock_image.assert_called_once()
         finally:

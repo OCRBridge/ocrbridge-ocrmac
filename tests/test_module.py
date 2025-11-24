@@ -2,7 +2,6 @@
 
 import importlib.metadata
 import sys
-from typing import Any
 
 import pytest
 
@@ -122,11 +121,11 @@ class TestModuleVersion:
 
                 pyproject = tomllib.load(f)
             else:
-                import tomli
+                import tomli  # type: ignore[reportMissingImports]
 
                 pyproject = tomli.load(f)  # type: ignore[reportUnknownMemberType]
 
-        pyproject_version = pyproject["project"]["version"]
+        pyproject_version = pyproject["project"]["version"]  # type: ignore[reportUnknownVariableType]
         assert ocrmac.__version__ == pyproject_version
 
 

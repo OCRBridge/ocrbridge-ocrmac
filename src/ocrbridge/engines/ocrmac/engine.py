@@ -120,7 +120,7 @@ class OcrmacEngine(OCREngine):
     def _process_image(self, image_path: Path, params: OcrmacParams) -> str:
         """Process image with ocrmac."""
         try:
-            ocrmac = importlib.import_module("ocrmac")
+            ocrmac = importlib.import_module("ocrmac.ocrmac")
         except ImportError as e:
             raise OCRProcessingError(
                 "ocrmac not installed. Install with: pip install ocrmac"
@@ -165,7 +165,7 @@ class OcrmacEngine(OCREngine):
     def _process_pdf(self, pdf_path: Path, params: OcrmacParams) -> str:
         """Process PDF by converting to images then OCR."""
         try:
-            ocrmac = importlib.import_module("ocrmac")
+            ocrmac = importlib.import_module("ocrmac.ocrmac")
         except ImportError as e:
             raise OCRProcessingError(
                 "ocrmac not installed. Install with: pip install ocrmac"
