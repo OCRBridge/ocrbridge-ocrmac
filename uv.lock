@@ -538,7 +538,7 @@ version = "2.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "ocrbridge-core" },
-    { name = "ocrmac" },
+    { name = "ocrmac", marker = "sys_platform == 'darwin'" },
     { name = "pdf2image" },
     { name = "pillow" },
 ]
@@ -565,7 +565,7 @@ requires-dist = [
     { name = "gitlint", marker = "extra == 'dev'", specifier = ">=0.19.0" },
     { name = "hatchling", marker = "extra == 'build'" },
     { name = "ocrbridge-core", specifier = ">=3.1.0" },
-    { name = "ocrmac", specifier = ">=0.2.2" },
+    { name = "ocrmac", marker = "sys_platform == 'darwin'", specifier = ">=0.2.2" },
     { name = "pdf2image", specifier = ">=1.17.0" },
     { name = "pillow", specifier = ">=10.0.0" },
     { name = "prek", marker = "extra == 'dev'", specifier = ">=0.3.4" },
