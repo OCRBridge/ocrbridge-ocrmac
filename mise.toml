@@ -41,7 +41,8 @@ depends = ["check", "format"]
 
 [tasks.commit-check]
 description = "Run Conventional Commit checks via prek"
-run = "uvx --from prek==0.3.4 --with gitlint==0.19.1 prek run conventional-commits-ci --stage manual"
+depends = ["install"]
+run = "uv run prek run conventional-commits-ci --stage manual"
 
 [tools]
 python = "{{ get_env(name='PYTHON_VERSION', default='3.11') }}"

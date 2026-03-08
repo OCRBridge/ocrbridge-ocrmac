@@ -7,7 +7,7 @@ repo = "local"
 id = "conventional-commits-msg"
 name = "Conventional Commits (commit-msg)"
 language = "system"
-entry = "uvx --from gitlint==0.19.1 gitlint --config .gitlint --msg-filename"
+entry = "uv run gitlint --config .gitlint --msg-filename"
 stages = ["commit-msg"]
 pass_filenames = true
 always_run = true
@@ -16,7 +16,7 @@ always_run = true
 id = "conventional-commits-ci"
 name = "Conventional Commits (CI range)"
 language = "system"
-entry = "bash -lc 'uvx --from gitlint==0.19.1 gitlint --config .gitlint --commits \"${PREK_COMMIT_RANGE:?PREK_COMMIT_RANGE is required}\"'"
+entry = "bash -lc 'uv run gitlint --config .gitlint --commits \"${PREK_COMMIT_RANGE:?PREK_COMMIT_RANGE is required}\"'"
 stages = ["manual"]
 pass_filenames = false
 always_run = true
